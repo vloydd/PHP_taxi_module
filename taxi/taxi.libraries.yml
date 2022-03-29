@@ -1,0 +1,8 @@
+taxi.page:
+  css:
+    base:
+      css/style.css: {}
+taxi:
+  dependencies:
+    - core/jquery
+    - core/ajax

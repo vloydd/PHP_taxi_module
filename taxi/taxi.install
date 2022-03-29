@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * @file
+ * Our Install and Uninstall Hooks.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function taxi_schema(): array {
+  $schema['taxi'] = [
+    'description' => 'Table of Your Cats',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'name' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ],
+      'email' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'time' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'timestamp' => [
+        'type' => 'int',
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => [
+      'id',
+    ],
+  ];
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function taxi_uninstall() {
+  \Drupal::state()->delete('taxi.taxi');
+}

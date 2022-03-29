@@ -1,0 +1,6 @@
+name: Taxi
+description: This module let's you book a taxi.
+type: module
+core_version_requirement: ^9.0
+package: custom
+libraries: taxi/taxi

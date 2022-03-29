@@ -1,0 +1,6 @@
+admin-page.structure:
+  title: 'Taxi Request List'
+  description: 'Administer Taxi Request List'
+  parent: system.admin_structure
+  route_name: taxi.admin-page
+  weight: 5

@@ -1,0 +1,31 @@
+taxi.main-page:
+  path: '/taxi'
+  defaults:
+    _controller: '\Drupal\taxi\Controller\TaxiPage::content'
+    _title: 'Taxi'
+  requirements:
+    _permission: 'access content'
+
+taxi.admin-page:
+  path: '/admin/structure/taxi'
+  defaults:
+    _form: '\Drupal\taxi\Form\TaxiList'
+    _title: 'Administer Taxi Requests'
+  requirements:
+    _permission: 'administer site configuration'
+
+taxi.delete-admin:
+  path: '/admin/structure/taxilist/{id}/delete'
+  defaults:
+    _form: '\Drupal\taxi\Form\TaxiDeleteAdmin'
+    _title: 'Delete Form for Admins'
+  requirements:
+    _permission: 'administer site configuration'
+
+taxi.edit-admin:
+  path: '/admin/structure/taxilist/{id}/edit'
+  defaults:
+    _form: '\Drupal\taxi\Form\TaxiEditAdmin'
+    _title: 'Edit Form for Admins'
+  requirements:
+    _permission: 'administer site configuration'
