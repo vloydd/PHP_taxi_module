@@ -13,7 +13,6 @@ function taxi_theme($existing, $type, $theme, $path) {
     "taxi-theme" => [
       "variables" => [
         'form' => [],
-        'cats' => [],
       ],
     ],
   ];

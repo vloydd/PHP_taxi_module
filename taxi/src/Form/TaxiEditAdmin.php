@@ -47,7 +47,10 @@ class TaxiEditAdmin extends TaxiForm {
     ];
     $form['name']['#default_value'] = (isset($data['name'])) ? $data['name'] : '';
     $form['email']['#default_value'] = (isset($data['email'])) ? $data['email'] : '';
-    $form['time']['#default_value'][] = (isset($data['time'])) ? $data['time'] : '';
+    $form['adults']['#default_value'][] = (isset($data['adults'])) ? $data['adults'] : '';
+    $form['children']['#default_value'][] = (isset($data['children'])) ? $data['children'] : '';
+    $form['road']['#default_value'][] = (isset($data['road'])) ? $data['road'] : '';
+    $form['tariff']['#default_value'][] = (isset($data['tariff'])) ? $data['tariff'] : '';
     $form['actions']['submit']['#value'] = $this->t('Edit');
     return $form;
   }
@@ -60,6 +63,10 @@ class TaxiEditAdmin extends TaxiForm {
       'name' => $form_state->getValue('name'),
       'email' => $form_state->getValue('email'),
       'time' => strtotime($form_state->getValue('time')),
+      'adults' => $form_state->getValue('adults'),
+      'children' => $form_state->getValue('children'),
+      'road' => $form_state->getValue('road'),
+      'tariff' => $form_state->getValue('tariff'),
       'timestamp' => time(),
     ];
 
@@ -69,9 +76,8 @@ class TaxiEditAdmin extends TaxiForm {
     else {
       \Drupal::database()->insert('taxi')->fields($data)->execute();
     }
-    \Drupal::database()->insert('taxi')->fields($data)->execute();
     $this->messenger()
-      ->addStatus($this->t('You Booked a Taxi on %time.', ['%time' => $form_state->getValue('time')]));
+      ->addStatus($this->t('You Edited Book Request on %time.', ['%time' => $form_state->getValue('time')]));
 
   }
 

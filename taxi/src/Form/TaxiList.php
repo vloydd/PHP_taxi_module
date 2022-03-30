@@ -67,7 +67,10 @@ class TaxiList extends ConfirmFormBase {
   public function buildForm(array $form, FormStateInterface $form_state, $id = NULL) {
     $this->id = \Drupal::routeMatch()->getParameter('id');
     $queries = \Drupal::database()->select('taxi', 't');
-    $queries->fields('t', ['id', 'name', 'email', 'time', 'timestamp']);
+    $queries->fields('t', [
+      'id', 'name', 'email', 'time', 'adults', 'children', 'road', 'tariff', 'timestamp'
+      ]
+    );
     $queries->orderBy('t.time', 'ASC');
     $results = $queries->execute()->fetchAll();
     $requests = [];
@@ -113,6 +116,10 @@ class TaxiList extends ConfirmFormBase {
         'id' => $data->id,
         'name' => $data->name,
         'email' => $data->email,
+        'adults' => $data->adults,
+        'children' => $data->children,
+        'tariff' => $data->tariff,
+        'road' => $data->road,
         'timestamp' => date('d.m.y H:i:s', $data->timestamp),
         'delete' => $delete,
         'edit'  => $edit,
@@ -122,6 +129,10 @@ class TaxiList extends ConfirmFormBase {
         'id' => $this->t('ID'),
         'name' => $this->t('Name'),
         'email' => $this->t('Email'),
+        'adults' => $this->t('Adults'),
+        'children' => $this->t('Children'),
+        'tariff' => $this->t('Tariff'),
+        'road' => $this->t('Road'),
         'timestamp' => $this->t('Date Creation'),
         'edit' => $this->t('Edit'),
         'delete' => $this->t('Delete'),

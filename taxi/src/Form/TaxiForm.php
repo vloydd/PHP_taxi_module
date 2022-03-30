@@ -82,18 +82,49 @@ class TaxiForm extends FormBase {
       '#date_date_format' => 'd/m/Y',
       '#date_time_format' => 'H:m',
       '#suffix' => '<p class="false_form false_time"></p>',
-      '#ajax' => [
-        'callback' => '::validateFormAjaxTime',
-        'event' => 'change',
-        'progress' => [
-          'type' => 'none',
-        ],
+    ];
+    $form['adults'] = [
+      '#title' => $this->t("Amount of Adults"),
+      '#type' => 'number',
+      '#min' => 0,
+      '#max' => 10,
+      '#required' => TRUE,
+      '#description' => $this->t('Only Alpha, ., _, - and @ Allowed'),
+      '#placeholder' => $this->t("Enter Amount of Adults"),
+    ];
+    $form['children'] = [
+      '#title' => $this->t("Amount of Children"),
+      '#type' => 'number',
+      '#required' => FALSE,
+      '#min' => 0,
+      '#max' => 10,
+      '#default_value' => 0,
+      '#description' => $this->t('Only 0-10 Allowed'),
+      '#placeholder' => $this->t("Enter Amount of Children"),
+    ];
+    $form['road'] = [
+      '#type' => 'select',
+      '#title' => $this->t("To/From Airport"),
+      '#required' => TRUE,
+      '#options' => [
+        'to' => $this->t('To'),
+        'from' => $this->t('From'),
+      ],
+    ];
+    $form['tariff'] = [
+      '#type' => 'select',
+      '#title' => $this->t("Your Tariff"),
+      '#required' => FALSE,
+      '#options' => [
+        'eco' => $this->t('Eco'),
+        'fast' => $this->t('Fast'),
+        'super' => $this->t('Super Fast'),
       ],
     ];
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#button_type' => 'primary',
-      '#value' => $this->t('Add Review'),
+      '#value' => $this->t('Order Now'),
       '#attributes' => [
         'class' => ['btn', 'btn-warning'],
       ],
@@ -113,17 +144,35 @@ class TaxiForm extends FormBase {
   public function validateForm(array &$form, FormStateInterface $form_state): void {
     $name = $form_state->getValue('name');
     $email = $form_state->getValue('email');
+    $adults = $form_state->getValue('adults');
+    $children = $form_state->getValue('children');
     $requiers_name = "/[-_'A-Za-z0-9 ]/";
-    $requiers_email = '/[-_@A-Za-z.]/';
+    $requiers_email = '/[-_@A-Za-z.0-9]/';
     $length_name = strlen($name);
     $length_email = strlen($email);
     $time = strtotime($form_state->getValue('time'));
     $timestamp = time();
-    if ($time - $timestamp < 3 * 60 * 60) {
+    if ($adults == 0 && $children == 0) {
+      $form_state->setErrorByName(
+        'adults',
+        $this->t(
+          "Taxi: You Cannot Book an Empty Taxi(."
+        )
+      );
+    }
+    if ($time < $timestamp) {
       $form_state->setErrorByName(
         'time',
         $this->t(
-          'Time: The Difference Should Be at Least 3 Hours(.'
+          "Time: You Cannot Book a Taxi in the Past(."
+        )
+      );
+    }
+    if ($time - $timestamp < 30 * 60) {
+      $form_state->setErrorByName(
+        'time',
+        $this->t(
+          'Time: The Difference Should Be at Least 30 Minutes(.'
         )
       );
     }
@@ -225,6 +274,7 @@ class TaxiForm extends FormBase {
       );
       return $response;
     }
+    $response->addCommand(new HtmlCommand('.false_name', ''));
     return $response;
   }
 
@@ -244,7 +294,7 @@ class TaxiForm extends FormBase {
     $length_email = strlen($email);
     $emptyemail = empty($email);
     $response = new AjaxResponse();
-    $requiers = '/[-_@A-Za-z.]/';
+    $requiers = '/\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}/';
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
       $tmp = 0;
       for ($i = 0; $i < (strlen($email)); $i++) {
@@ -302,34 +352,7 @@ class TaxiForm extends FormBase {
       );
       return $response;
     }
-    return $response;
-  }
-
-  /**
-   * Validates Our DateTime with AJAX.
-   *
-   * @param array $form
-   *   Comment smth.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   Comment smth.
-   *
-   * @return \Drupal\Core\Ajax\AjaxResponse
-   *   Comment smth.
-   */
-  public function validateFormAjaxTime(array &$form, FormStateInterface $form_state): AjaxResponse {
-    $response = new AjaxResponse();
-    $time = strtotime($form_state->getValue('time'));
-    $timestamp = time();
-    if ($time - $timestamp <= 3 * 60 * 60) {
-      $message = $this->t('Time: The Difference Should Be at Least 3 Hours(.');
-      $response->addCommand(
-        new HtmlCommand(
-          '.false_time',
-          $message
-        )
-      );
-      return $response;
-    }
+    $response->addCommand(new HtmlCommand('.false_email', ''));
     return $response;
   }
 
@@ -360,6 +383,10 @@ class TaxiForm extends FormBase {
       'name' => $form_state->getValue('name'),
       'email' => $form_state->getValue('email'),
       'time' => strtotime($form_state->getValue('time')),
+      'adults' => $form_state->getValue('adults'),
+      'children' => $form_state->getValue('children'),
+      'road' => $form_state->getValue('road'),
+      'tariff' => $form_state->getValue('tariff'),
       'timestamp' => time(),
     ];
 

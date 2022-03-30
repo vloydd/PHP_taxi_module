@@ -10,7 +10,7 @@
  */
 function taxi_schema(): array {
   $schema['taxi'] = [
-    'description' => 'Table of Your Cats',
+    'description' => 'Table of Taxi Requests',
     'fields' => [
       'id' => [
         'type' => 'serial',
@@ -29,6 +29,26 @@ function taxi_schema(): array {
       ],
       'time' => [
         'type' => 'int',
+        'not null' => TRUE,
+      ],
+      'adults' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+      'children' => [
+        'type' => 'int',
+        'null' => TRUE,
+        'default' => 0,
+      ],
+      'road' => [
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'tariff' => [
+        'type' => 'varchar',
+        'length' => 255,
         'not null' => TRUE,
       ],
       'timestamp' => [
