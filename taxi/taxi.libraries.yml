@@ -1,4 +1,4 @@
-taxi.page:
+taxi_library:
   css:
     base:
       css/style.css: {}

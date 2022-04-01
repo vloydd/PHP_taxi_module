@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * Implements hook_mail().
+ */
+function taxi_mail($key, &$message, $test) {
+
+  switch ($key) {
+    case 'ordered': {
+    // E-mail formatting will be exactly as below, so do not use indenting!
+      $body =
+          "Dear " . $test['name'] .",
+
+        You Just Ordered " . $test['tariff']. " Taxi " . $test['road']. " Our Airport.
+
+        Your Taxi Will Wait You at  " . date('d.m.y H:i:s', $test['time']) . "
+        There Will Be Free Space for: " . $test['adults'] . " Adult(s) and " . $test['children'] . " Child(ren).
+        See Ya!
+
+          With Love, Bahrain Airport Taxi Service";
+      $message['subject'] = "Taxi Request";
+      $message['body'][] = Drupal\Core\Mail\MailFormatHelper::htmlToText($body);
+    }
+  }
+}

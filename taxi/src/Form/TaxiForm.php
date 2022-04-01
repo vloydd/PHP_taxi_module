@@ -89,8 +89,8 @@ class TaxiForm extends FormBase {
       '#required' => TRUE,
       '#wrapper_attributes' => ['class' => 'col-6'],
       '#options' => [
-        'to' => $this->t('To'),
-        'from' => $this->t('From'),
+        'To' => $this->t('To'),
+        'From' => $this->t('From'),
       ],
     ];
     $form['tariff'] = [
@@ -99,9 +99,9 @@ class TaxiForm extends FormBase {
       '#required' => FALSE,
       '#wrapper_attributes' => ['class' => 'col-6'],
       '#options' => [
-        'eco' => $this->t('Eco'),
-        'fast' => $this->t('Fast'),
-        'super' => $this->t('Super Fast'),
+        'Eco' => $this->t('Eco'),
+        'Fast' => $this->t('Fast'),
+        'Super-Fast' => $this->t('Super Fast'),
       ],
     ];
     $form['actions']['submit'] = [
@@ -118,6 +118,7 @@ class TaxiForm extends FormBase {
         'event' => 'click',
       ],
     ];
+    $form['#attached']['library'][] = 'taxi/taxi_library';
     return $form;
   }
 
@@ -129,18 +130,22 @@ class TaxiForm extends FormBase {
     $email = $form_state->getValue('email');
     $adults = $form_state->getValue('adults');
     $children = $form_state->getValue('children');
+    $road = $form_state->getValue('road');
     $requires_name = "/[-_'A-Za-z0-9 ]/";
     $requires_email = '/\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}/';
     $length_name = strlen($name);
     $time = strtotime($form_state->getValue('time'));
     $timestamp = time();
     $queries = \Drupal::database()->select('taxi', 't');
-    $queries->fields('t', ['time']);
+    $queries->fields('t', ['name', 'email','time', 'road']);
     $results = $queries->execute()->fetchAll();
     $requests = [];
     foreach ($results as $data) {
       $requests[] = [
+        'name' => $data->name,
+        'email' => $data->email,
         'time' => $data->time,
+        'road' => $data->road,
       ];
     }
     for ($i = 0; $i < count($requests); $i++) {
@@ -149,6 +154,14 @@ class TaxiForm extends FormBase {
           'time',
           $this->t(
             "Time: Sorry, We Already Have a Request on This Time(."
+          )
+        );
+      }
+      if ($name == $requests[$i]['name'] && $email == $requests[$i]['email'] && $road == $requests[$i]['road']) {
+        $form_state->setErrorByName(
+          'name',
+          $this->t(
+            "Taxi: Sorry, We Already Have an Order From You. You Can't Ride in Two Cars in Same Direction(."
           )
         );
       }
@@ -245,6 +258,17 @@ class TaxiForm extends FormBase {
     ];
 
     \Drupal::database()->insert('taxi')->fields($data)->execute();
+
+    $newMail = \Drupal::service('plugin.manager.mail');
+    $test['name'] = $form_state->getValue('name');
+    $test['email'] = $form_state->getValue('email');
+    $test['time'] = strtotime($form_state->getValue('time'));
+    $test['adults'] = $form_state->getValue('adults');
+    $test['children'] = $form_state->getValue('children');
+    $test['road'] = $form_state->getValue('road');
+    $test['tariff'] = $form_state->getValue('tariff');
+
+    $mail = $newMail->mail('taxi', 'ordered', $test['email'], 'en', $test, $reply = NULL, $send = TRUE);
 
     $this->messenger()
       ->addStatus($this->t('You Booked a Taxi on %time.', ['%time' => $form_state->getValue('time')]));
