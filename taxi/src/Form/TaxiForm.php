@@ -2,12 +2,8 @@
 
 namespace Drupal\taxi\Form;
 
-use Drupal\Core\Ajax\HtmlCommand;
-use Drupal\Core\Ajax\RedirectCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Url;
 
 /**
  * Our Form Class.
@@ -136,7 +132,6 @@ class TaxiForm extends FormBase {
     $requires_name = "/[-_'A-Za-z0-9 ]/";
     $requires_email = '/\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}/';
     $length_name = strlen($name);
-    $length_email = strlen($email);
     $time = strtotime($form_state->getValue('time'));
     $timestamp = time();
     $queries = \Drupal::database()->select('taxi', 't');
@@ -206,25 +201,19 @@ class TaxiForm extends FormBase {
         )
       );
     }
-    for ($i = 0; $i < $length_name; $i++) {
-      if (!preg_match($requires_name, $name[$i])) {
-        $form_state->setErrorByName('name',
-          $this->t(
-            "Name: Oh No! In Your Name %title You False Symbols(. Acceptable is: A-Z, 0-9 _ and '.", ['%title' => $name]
-          )
-        );
-      }
+    if (!preg_match($requires_name, $name)) {
+      $form_state->setErrorByName('name',
+        $this->t(
+          "Name: Oh No! In Your Name %title You False Symbols(. Acceptable is: A-Z, 0-9 _ and '.", ['%title' => $name]
+        )
+      );
     }
-    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      for ($i = 0; $i < $length_email; $i++) {
-        if (!preg_match($requires_email, $email[$i])) {
-          $form_state->setErrorByName('email',
-            $this->t(
-              'Mail: Oh No! Your Email %title is Invalid(', ['%title' => $email]
-            )
-          );
-        }
-      }
+    if (!preg_match($requires_email, $email)) {
+      $form_state->setErrorByName('email',
+        $this->t(
+          'Mail: Oh No! Your Email %title is Invalid(', ['%title' => $email]
+        )
+      );
     }
   }
 
@@ -237,13 +226,6 @@ class TaxiForm extends FormBase {
    *   Comment smth.
    */
   public function setMessage(array &$form, FormStateInterface $form_state) {
-    $response = new AjaxResponse();
-    if (!$form_state->hasAnyErrors()) {
-      $url = Url::fromRoute('taxi.main-page');
-      $command = new RedirectCommand($url->toString());
-      $response->addCommand($command);
-      return $response;
-    }
     return $form;
   }
 

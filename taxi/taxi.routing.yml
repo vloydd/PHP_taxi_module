@@ -1,11 +1,3 @@
-taxi.main-page:
-  path: '/taxi'
-  defaults:
-    _controller: '\Drupal\taxi\Controller\TaxiPage::content'
-    _title: 'Taxi'
-  requirements:
-    _permission: 'access content'
-
 taxi.admin-page:
   path: '/admin/structure/taxi'
   defaults:
